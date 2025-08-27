@@ -110,6 +110,10 @@ const typeDefs = `
           published: Int
           genres: [String]
         ) : Book
+        editAuthor(
+          name: String!
+          setBornTo: Int!
+        ) : Author
     }
 `
 
@@ -128,11 +132,10 @@ const resolvers = {
       return booksFiltered
     },
     allAuthors: () => {
-      return authors.map(auth => {
-        const name = auth.name
-        const bookCount = books.reduce((acc, book) => (book.author == auth.name ? acc + 1 : acc), 0)
-        return { name, bookCount }
-      })
+      return authors.map(author => ({
+        ...author,
+        bookCount: books.filter(book => book.author === author.name).length,
+      }))
     },
   },
   Mutation: {
@@ -146,6 +149,15 @@ const resolvers = {
       }
 
       return book
+    },
+    editAuthor: (root, args) => {
+      const author = authors.find(author => author.name === args.name)
+      if (!author) return null
+
+      const updatedAuthor = { ...author, born: args.setBornTo }
+      authors = authors.map(author => (author.name === args.name ? updatedAuthor : author))
+
+      return updatedAuthor
     },
   },
 }
