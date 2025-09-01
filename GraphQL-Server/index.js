@@ -1,6 +1,5 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
-const { v1: uuid } = require('uuid')
 
 const mongoose = require('mongoose')
 const Book = require('./models/book')
@@ -96,7 +95,7 @@ const resolvers = {
       try {
         let author = await Author.findOne({ name: args.author })
         if (!author) {
-          author = new Author({ name: args.author })
+          author = new Author({ name: args.author, born: null })
           await author.save()
         }
         const book = new Book({ ...args, author })
@@ -108,18 +107,15 @@ const resolvers = {
       }
     },
 
-    editAuthor: (root, args) => {
-      const author = authors.find(author => author.name === args.name)
+    editAuthor: async (root, args) => {
+      const author = await Author.findOne({ name: args.name })
       if (!author) return null
 
-      const updatedAuthor = {
-        ...author,
-        born: args.setBornTo,
-        bookCount: books.filter(book => book.author === author.name).length,
-      }
-      authors = authors.map(author => (author.name === args.name ? updatedAuthor : author))
+      author.born = args.setBornTo
+      await author.save()
 
-      return updatedAuthor
+      const bookCount = await Book.countDocuments({ author: author._id })
+      return { ...author._doc, bookCount }
     },
   },
 }
