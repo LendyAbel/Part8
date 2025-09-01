@@ -27,7 +27,7 @@ const Authors = () => {
           ))}
         </tbody>
       </table>
-      <SetBirthForm />
+      <SetBirthForm authors={authors} />
     </div>
   )
 }
