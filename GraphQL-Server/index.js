@@ -2,6 +2,19 @@ const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
 const { v1: uuid } = require('uuid')
 
+const mongoose = require('mongoose')
+const Book = require('./models/book')
+const Author = require('./models/author')
+require('dotenv').config()
+
+const MONGODB_URI = process.env.MONGODB_URI
+console.log('conecting to', MONGODB_URI)
+
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => console.log('connected to MongoDB'))
+  .catch(error => console.log('error connection to MongoDB:', error.message))
+
 let authors = [
   {
     name: 'Robert Martin',
@@ -83,9 +96,9 @@ let books = [
 const typeDefs = `
     type Book {
         title: String!
-        author: String!
+        author: Author!
         published: Int
-        genres: [String]
+        genres: [String!]!
         id: ID!
     }
 
@@ -98,8 +111,11 @@ const typeDefs = `
 
     type Query {
         bookCount: Int!
+
         authorCount: Int!
+
         allBooks (author: String, genre: String) : [Book!]!
+
         allAuthors: [Author!]!
     }
 
@@ -110,6 +126,7 @@ const typeDefs = `
           published: Int
           genres: [String]
         ) : Book
+
         editAuthor(
           name: String!
           setBornTo: Int!
@@ -139,17 +156,22 @@ const resolvers = {
     },
   },
   Mutation: {
-    addBook: (root, args) => {
-      const book = { ...args, id: uuid() }
-      books = books.concat(book)
+    addBook: async (root, args) => {
+      try {
+        let author = await Author.findOne({ name: args.author })
+        if (!author) {
+          author = new Author({ name: args.author })
+          await author.save()
+        }
+        const book = new Book({ ...args, author })
+        await book.save()
 
-      const authorExist = authors.find(author => author.name === args.author)
-      if (!authorExist) {
-        authors = authors.concat({ name: args.author, id: uuid() })
+        return book
+      } catch (error) {
+        console.log('Error creating book: ', error)
       }
-
-      return book
     },
+
     editAuthor: (root, args) => {
       const author = authors.find(author => author.name === args.name)
       if (!author) return null
