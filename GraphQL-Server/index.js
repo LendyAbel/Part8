@@ -154,7 +154,11 @@ const resolvers = {
       const author = authors.find(author => author.name === args.name)
       if (!author) return null
 
-      const updatedAuthor = { ...author, born: args.setBornTo }
+      const updatedAuthor = {
+        ...author,
+        born: args.setBornTo,
+        bookCount: books.filter(book => book.author === author.name).length,
+      }
       authors = authors.map(author => (author.name === args.name ? updatedAuthor : author))
 
       return updatedAuthor

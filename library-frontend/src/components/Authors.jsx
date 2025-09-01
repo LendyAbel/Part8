@@ -1,10 +1,11 @@
 import { useQuery } from '@apollo/client/react'
 import { ALL_AUTHORS } from '../queries'
+import SetBirthForm from './SetBirthForm'
 
 const Authors = () => {
   const result = useQuery(ALL_AUTHORS)
   if (result.loading) return <div>loading...</div>
- 
+
   const authors = result.data.allAuthors
 
   return (
@@ -17,7 +18,7 @@ const Authors = () => {
             <th>born</th>
             <th>books</th>
           </tr>
-          {authors.map((a) => (
+          {authors.map(a => (
             <tr key={a.name}>
               <td>{a.name}</td>
               <td>{a.born}</td>
@@ -26,6 +27,7 @@ const Authors = () => {
           ))}
         </tbody>
       </table>
+      <SetBirthForm />
     </div>
   )
 }
