@@ -108,11 +108,9 @@ const resolvers = {
       const authorsWhithBookCount = await Promise.all(
         authors.map(async author => {
           const bookCount = await Book.countDocuments({ author: author._id })
-
-          return { ...author._doc, bookCount }
+          return { ...author.toObject(), id: author._id.toString(), bookCount }
         })
       )
-
       return authorsWhithBookCount
     },
   },
@@ -170,19 +168,20 @@ const resolvers = {
       }
 
       const author = await Author.findOne({ name: args.name })
-      if (!author)
+      if (!author) {
         throw new GraphQLError('Author no found', {
           extensions: {
             code: 'BAD_USER_INPUT',
             invalidArgs: args.name,
           },
         })
+      }
 
       try {
         author.born = args.setBornTo
         await author.save()
         const bookCount = await Book.countDocuments({ author: author._id })
-        return { ...author._doc, bookCount }
+        return { ...author.toObject(), id: author._id.toString(), bookCount }
       } catch (error) {
         if (error.name === 'ValidationError') {
           throw new GraphQLError('Creating book failed', {
