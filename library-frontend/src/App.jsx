@@ -5,9 +5,11 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
+import Recomendation from './components/Recomendation'
 
 const App = () => {
   const [token, setToken] = useState(null)
+  const [userFavoriteGenre, setUserFavoriteGenre] = useState('')
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -33,11 +35,14 @@ const App = () => {
           <button>authors</button>
         </Link>
         {!token ? (
-          <LoginForm setToken={setToken} />
+          <LoginForm setToken={setToken} setFavorite={setUserFavoriteGenre} />
         ) : (
           <>
             <Link to={'/books/newbook'}>
               <button>add book</button>
+            </Link>
+            <Link to={'/recommend'}>
+              <button>recommend</button>
             </Link>
             <button onClick={handleLogout}>logout</button>
           </>
@@ -49,6 +54,7 @@ const App = () => {
         <Route path='/authors' element={<Authors token={token} />} />
         <Route path='/books' element={<Books />} />
         <Route path='/books/newbook' element={<NewBook />} />
+        <Route path='/recommend' element={<Recomendation favoriteGenre={userFavoriteGenre} />} />
       </Routes>
     </div>
   )
