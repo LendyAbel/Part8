@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Routes, Route, Link, Navigate } from 'react-router'
+import { useEffect, useState } from 'react'
+import { Routes, Route, Link, Navigate, useNavigate } from 'react-router'
 
 import Authors from './components/Authors'
 import Books from './components/Books'
@@ -8,11 +8,20 @@ import LoginForm from './components/LoginForm'
 
 const App = () => {
   const [token, setToken] = useState(null)
+  const navigate = useNavigate()
 
-  const handleLogout = ()=>{
+  const handleLogout = () => {
     setToken('')
     localStorage.clear()
+    navigate('/books')
   }
+
+  useEffect(() => {
+    const token = localStorage.getItem('userLoggedToken')
+    if (token) {
+      setToken(token)
+    }
+  }, [])
 
   return (
     <div>
@@ -25,18 +34,19 @@ const App = () => {
         </Link>
         {!token ? (
           <LoginForm setToken={setToken} />
-        ) : (<>
+        ) : (
+          <>
             <Link to={'/books/newbook'}>
-            <button>add book</button>
-          </Link>
-          <button onClick={handleLogout} >logout</button>
-        </>
+              <button>add book</button>
+            </Link>
+            <button onClick={handleLogout}>logout</button>
+          </>
         )}
       </div>
 
       <Routes>
         <Route path='/' element={<Navigate to={'/books'} replace />} />
-        <Route path='/authors' element={<Authors />} />
+        <Route path='/authors' element={<Authors token={token} />} />
         <Route path='/books' element={<Books />} />
         <Route path='/books/newbook' element={<NewBook />} />
       </Routes>

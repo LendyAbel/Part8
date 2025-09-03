@@ -12,7 +12,7 @@ const SetBirthForm = ({ authors }) => {
 
   const handleSubmit = e => {
     e.preventDefault()
-    updateAuthor({ variables: { name, setBornTo: Number(year) } })
+    updateAuthor({ variables: { name, setBornTo: year? Number(year): null } })
     setName('')
     setYear('')
   }
@@ -22,6 +22,7 @@ const SetBirthForm = ({ authors }) => {
       <h3>Set birthyear:</h3>
       <form onSubmit={handleSubmit}>
         <select onChange={e => setName(e.target.value)}>
+          <option value=''>-- Select an author --</option>
           {authors?.map(a => (
             <option key={a.id}>{a.name}</option>
           ))}

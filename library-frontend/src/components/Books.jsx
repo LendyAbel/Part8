@@ -19,8 +19,6 @@ const Books = () => {
     return genresAcc
   }, [])
 
-  console.log(filter)
-
   const booksFiltered =
     filter === 'all genres'
       ? books
@@ -29,8 +27,6 @@ const Books = () => {
             return book
           }
         })
-
-  console.log(booksFiltered)
 
   return (
     <div>

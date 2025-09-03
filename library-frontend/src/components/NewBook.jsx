@@ -10,13 +10,16 @@ const NewBook = () => {
   const [genres, setGenres] = useState([])
 
   const [addBook, result] = useMutation(CREATE_BOOK, {
+    onCompleted: data => {
+      console.log(data)
+    },
     refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
   })
 
   const submit = async event => {
     event.preventDefault()
 
-    const book = { title, author, published: Number(published), genres }
+    const book = { title, author, published: published ? Number(published) : null, genres }
 
     addBook({ variables: book })
     console.log('add book...')
