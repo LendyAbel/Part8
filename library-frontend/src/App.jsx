@@ -10,6 +10,7 @@ import Recomendation from './components/Recomendation'
 const App = () => {
   const [token, setToken] = useState(null)
   const [userFavoriteGenre, setUserFavoriteGenre] = useState('')
+  const [filter, setFilter] = useState('all genres')
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -54,7 +55,7 @@ const App = () => {
       <Routes>
         <Route path='/' element={<Navigate to={'/books'} replace />} />
         <Route path='/authors' element={<Authors token={token} />} />
-        <Route path='/books' element={<Books />} />
+        <Route path='/books' element={<Books filter={filter} setFilter={setFilter} />} />
         <Route path='/books/newbook' element={<NewBook />} />
         <Route path='/recommend' element={<Recomendation favoriteGenre={userFavoriteGenre} />} />
       </Routes>
