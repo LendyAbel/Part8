@@ -17,9 +17,10 @@ const LoginForm = ({ setToken, setFavorite }) => {
       setToken(token)
       setFavorite(favoriteGenre)
       localStorage.setItem('userLoggedToken', token)
+      localStorage.setItem('userLoggedFavoriteGenre', favoriteGenre)
       navigate('/books')
     }
-  }, [result.data, setToken, navigate])
+  }, [result.data, setToken, navigate, setFavorite])
 
   const handleSubmit = e => {
     e.preventDefault()

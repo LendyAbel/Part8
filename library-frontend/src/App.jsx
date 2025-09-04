@@ -20,8 +20,10 @@ const App = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('userLoggedToken')
+    const favoriteGenre = localStorage.getItem('userLogeedFavoriteGenre')
     if (token) {
       setToken(token)
+      setUserFavoriteGenre(favoriteGenre)
     }
   }, [])
 

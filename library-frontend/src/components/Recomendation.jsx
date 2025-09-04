@@ -1,17 +1,11 @@
 import { useQuery } from '@apollo/client/react'
-import { ALL_BOOKS } from '../queries'
+import { BOOKS_BY_GENRE } from '../queries'
 
 const Recomendation = ({ favoriteGenre }) => {
-  const result = useQuery(ALL_BOOKS)
-  if (result.loading) return <div>loading...</div>
+  const resultFilter = useQuery(BOOKS_BY_GENRE, { variables: { genre: favoriteGenre } })
+  if (resultFilter.loading) return <div>loading...</div>
 
-  const books = result.data.allBooks
-
-  const favoritesBooks = books.filter(book => {
-    if (book.genres.includes(favoriteGenre)) {
-      return book
-    }
-  })
+  const favoritesBooks = resultFilter.data.allBooks
 
   return (
     <div>
