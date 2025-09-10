@@ -1,4 +1,4 @@
-const UserTypeDef = `
+const User = `
     type Token {
       value: String!
     }
@@ -17,4 +17,4 @@ const UserTypeDef = `
 
 const resolvers = {}
 
-module.exports = { UserTypeDef }
+module.exports = { User }

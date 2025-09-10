@@ -1,4 +1,4 @@
-const BookTypeDef = `
+const Book = `
     type Book {
         title: String!
         author: Author!
@@ -9,4 +9,4 @@ const BookTypeDef = `
 `
 const resolvers = {}
 
-module.exports = { BookTypeDef }
+module.exports = { Book }
