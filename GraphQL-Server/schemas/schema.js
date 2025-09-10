@@ -1,54 +1,13 @@
-const { ApolloServer } = require('@apollo/server')
-const { startStandaloneServer } = require('@apollo/server/standalone')
-const { GraphQLError } = require('graphql')
+import { makeExecutableSchema } from '@graphql-tools/schema'
 
-const mongoose = require('mongoose')
-const Book = require('./models/book')
-const Author = require('./models/author')
-require('dotenv').config()
+import { typeDef as BookTypeDef } from './book'
+import { typeDef as AuthorTypeDef } from './author'
+import { typeDef as UserTypeDef } from './user'
 
-const User = require('./models/user')
-const jwt = require('jsonwebtoken')
+const Book = require('../models/book')
+const Author = require('../models/author')
 
-const MONGODB_URI = process.env.MONGODB_URI
-console.log('conecting to MongoDB')
-
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => console.log('connected to MongoDB'))
-  .catch(error => console.log('error connection to MongoDB:', error.message))
-
-const typeDefs = `
-    type Book {
-        title: String!
-        author: Author!
-        published: Int
-        genres: [String!]!
-        id: ID!
-    }
-
-    type Author {
-        name: String!
-        born: Int
-        id: ID!
-        bookCount: Int
-    }
-
-    type Token {
-      value: String!
-    }
-
-    type User {
-      username: String!
-      favoriteGenre: String!
-      id: ID!
-    }
-
-    type LoginResponse {
-      token: Token!
-      user: User!
-    }
-
+const Query = `
     type Query {
         bookCount: Int!
 
@@ -60,7 +19,9 @@ const typeDefs = `
 
         me: User
     }
+`
 
+const Mutation = `
     type Mutation {
         addBook(
           title: String!
@@ -250,21 +211,7 @@ const resolvers = {
   },
 }
 
-const server = new ApolloServer({
-  typeDefs,
+export const schema = makeExecutableSchema({
+  typeDefs: [Query, Mutation, BookTypeDef, AuthorTypeDef, UserTypeDef],
   resolvers,
-})
-
-startStandaloneServer(server, {
-  listen: { port: 4000 },
-  context: async ({ req, res }) => {
-    const auth = req ? req.headers.authorization : null
-    if (auth && auth.startsWith('Bearer ')) {
-      const decodeToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET)
-      const currentUser = await User.findById(decodeToken.id)
-      return { currentUser }
-    }
-  },
-}).then(({ url }) => {
-  console.log(`Server ready at ${url}`)
 })
