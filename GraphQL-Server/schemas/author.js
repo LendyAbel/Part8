@@ -1,4 +1,4 @@
-const AuthorTypeDef = `
+const Author = `
     type Author {
         name: String!
         born: Int
@@ -8,4 +8,4 @@ const AuthorTypeDef = `
 `
 const resolvers = {}
 
-module.exports = { AuthorTypeDef }
+module.exports = { Author }
