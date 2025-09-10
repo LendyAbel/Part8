@@ -1,4 +1,4 @@
-export const typeDef = `
+const UserTypeDef = `
     type Token {
       value: String!
     }
@@ -15,6 +15,6 @@ export const typeDef = `
     }
 `
 
-export const resolvers = {
-    
-}
+const resolvers = {}
+
+module.exports = { UserTypeDef }

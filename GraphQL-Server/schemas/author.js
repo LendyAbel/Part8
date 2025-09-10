@@ -1,4 +1,4 @@
-export const typeDef = `
+const AuthorTypeDef = `
     type Author {
         name: String!
         born: Int
@@ -6,4 +6,6 @@ export const typeDef = `
         bookCount: Int
     }
 `
-export const resolvers = {}
+const resolvers = {}
+
+module.exports = { AuthorTypeDef }

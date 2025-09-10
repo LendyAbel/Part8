@@ -1,11 +1,15 @@
-import { makeExecutableSchema } from '@graphql-tools/schema'
+const { GraphQLError } = require('graphql')
 
-import { typeDef as BookTypeDef } from './book'
-import { typeDef as AuthorTypeDef } from './author'
-import { typeDef as UserTypeDef } from './user'
+const { BookTypeDef } = require('./book.js')
+const { AuthorTypeDef } = require('./author.js')
+const { UserTypeDef } = require('./user.js')
 
 const Book = require('../models/book')
 const Author = require('../models/author')
+const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+
+
 
 const Query = `
     type Query {
@@ -50,7 +54,9 @@ const Mutation = `
 const resolvers = {
   Query: {
     bookCount: async () => await Book.collection.countDocuments(),
+
     authorCount: async () => await Author.collection.countDocuments(),
+
     allBooks: async (root, args) => {
       let filter = {}
 
@@ -69,6 +75,7 @@ const resolvers = {
       const books = await Book.find(filter).populate('author')
       return books
     },
+
     allAuthors: async () => {
       const authors = await Author.find({})
       const authorsWhithBookCount = await Promise.all(
@@ -80,6 +87,7 @@ const resolvers = {
       return authorsWhithBookCount
     },
   },
+  
   Mutation: {
     addBook: async (root, args, context) => {
       if (args.title.length < 5 || args.title.length < 4) {
@@ -211,7 +219,9 @@ const resolvers = {
   },
 }
 
-export const schema = makeExecutableSchema({
+const schema = ({
   typeDefs: [Query, Mutation, BookTypeDef, AuthorTypeDef, UserTypeDef],
   resolvers,
 })
+
+module.exports = { schema }
