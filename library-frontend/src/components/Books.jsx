@@ -1,15 +1,25 @@
 import { useQuery, useSubscription } from '@apollo/client/react'
 import { ALL_BOOKS, BOOKS_BY_GENRE, BOOK_ADDED } from '../queries'
+import { updateCacheAllBooks } from '../utils/updataCache'
 
 const Books = ({ filter, setFilter }) => {
   const result = useQuery(ALL_BOOKS)
-  const resultFilter = useQuery(BOOKS_BY_GENRE, { variables: filter !== 'all genres' ? { genre: filter } : null })
+  const resultFilter = useQuery(BOOKS_BY_GENRE, { variables: filter !== 'all genres' ? { genre: filter } : {} })
 
   useSubscription(BOOK_ADDED, {
-    onData: ({data})=>{
+    onData: ({ data, client }) => {
       console.log(data)
-      window.alert(`New book have been added: "${data.data.bookAdded.title}". Reload page to see the change`)
-    }
+      const addedBook = data.data.bookAdded
+
+      window.alert(`New book have been added: "${addedBook.title}". Reload page to see the change`)
+
+      // Update all book
+      updateCacheAllBooks(client.cache, { query: ALL_BOOKS }, addedBook)
+      // Update all books by genre
+      addedBook.genres.forEach(genre => {
+        updateCacheAllBooks(client.cache, { query: BOOKS_BY_GENRE, variables: { genre } }, addedBook)
+      })
+    },
   })
 
   if (result.loading) return <div>loading...</div>
@@ -26,7 +36,6 @@ const Books = ({ filter, setFilter }) => {
     })
     return genresAcc
   }, [])
-
 
   return (
     <div>
