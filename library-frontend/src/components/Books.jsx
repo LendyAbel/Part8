@@ -1,12 +1,17 @@
-import { useState } from 'react'
-import { useQuery } from '@apollo/client/react'
-import { ALL_BOOKS, BOOKS_BY_GENRE } from '../queries'
+import { useQuery, useSubscription } from '@apollo/client/react'
+import { ALL_BOOKS, BOOKS_BY_GENRE, BOOK_ADDED } from '../queries'
 
-const Books = ({filter, setFilter}) => {
-  
-
+const Books = ({ filter, setFilter }) => {
   const result = useQuery(ALL_BOOKS)
   const resultFilter = useQuery(BOOKS_BY_GENRE, { variables: filter !== 'all genres' ? { genre: filter } : null })
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({data})=>{
+      console.log(data)
+      window.alert(`New book have been added: "${data.data.bookAdded.title}". Reload page to see the change`)
+    }
+  })
+
   if (result.loading) return <div>loading...</div>
   if (resultFilter.loading) return <div>loading...</div>
 
@@ -21,6 +26,7 @@ const Books = ({filter, setFilter}) => {
     })
     return genresAcc
   }, [])
+
 
   return (
     <div>
