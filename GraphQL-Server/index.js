@@ -2,7 +2,6 @@ const { WebSocketServer } = require('ws')
 const { useServer } = require('graphql-ws/use/ws')
 
 const { ApolloServer } = require('@apollo/server')
-const { startStandaloneServer } = require('@apollo/server/standalone')
 const { expressMiddleware } = require('@as-integrations/express5')
 const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer')
 const express = require('express')
@@ -24,6 +23,7 @@ mongoose
   .connect(MONGODB_URI)
   .then(() => console.log('connected to MongoDB'))
   .catch(error => console.log('error connection to MongoDB:', error.message))
+mongoose.set('debug', true)
 
 const start = async () => {
   const app = express()
