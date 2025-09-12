@@ -11,7 +11,6 @@ const pubsub = new PubSub()
 const resolvers = {
   Query: {
     bookCount: async () => await Book.collection.countDocuments(),
-
     authorCount: async () => await Author.collection.countDocuments(),
 
     allBooks: async (root, args) => {
@@ -33,16 +32,7 @@ const resolvers = {
       return books
     },
 
-    allAuthors: async () => {
-      const authors = await Author.find({})
-      const authorsWhithBookCount = await Promise.all(
-        authors.map(async author => {
-          const bookCount = await Book.countDocuments({ author: author._id })
-          return { ...author.toObject(), id: author._id.toString(), bookCount }
-        })
-      )
-      return authorsWhithBookCount
-    },
+    allAuthors: async () => await Author.find({}),
   },
 
   Mutation: {
@@ -68,9 +58,13 @@ const resolvers = {
       try {
         let author = await Author.findOne({ name: args.author })
         if (!author) {
-          author = new Author({ name: args.author, born: null })
-          await author.save()
+          author = new Author({ name: args.author, born: null, bookCount: 1 })
+        } else {
+          console.log('AUTHOR', author)
+          author.bookCount = author.bookCount + 1
         }
+        await author.save()
+
         const book = new Book({ ...args, author })
         await book.save()
         pubsub.publish('BOOK_ADDED', { bookAdded: book })
